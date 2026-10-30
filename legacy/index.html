@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script src="https://code.iconify.design/iconify-icon/3.0.3/iconify-icon.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <div class="logo">
+          <div class="logoImg">
+            <img
+              src="./K_Bloom Perfume Logo.png"
+              alt="K-Bloom Logo"
+            />
+          </div>
+          <h4>K-Bloom</h4>
+        </div>
+
+        <div class="navbar">
+          <div class="navA">
+            <a href="#home">Home</a>
+            <a href="#product">Product</a>
+            <a href="#about">About</a>
+            <a href="#location">Location</a>
+          </div>
+
+          <div class="cardB">
+            <a href="#"><iconify-icon icon="akar-icons:cart"></iconify-icon></a>
+            <a href="#"
+              ><iconify-icon icon="iconamoon:profile-fill"></iconify-icon
+            ></a>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <section id="home" class="home">
+      <video autoplay muted loop playsinline class="bg-video">
+        <source src="./video/K-Bloom.mp4" type="video/mp4" />
+      </video>
+
+      <div class="container">
+        <div class="container-b">
+          <div class="textbox">
+            <h1>
+              <span class="welcome-line">
+                <span>Welcome to K-Bloom ||</span>
+                <img
+                  class="welcome-logo"
+                  src="./K_Bloom Perfume Logo.png"
+                  alt="K-Bloom Perfume Store logo"
+                />
+              </span>
+              <span class="welcome-tagline">Natural Beauty Awaits</span>
+            </h1>
+            <div class="spanbar">j</div>
+            <p>
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. <br />
+              Quidem qui corrupti quos ratione non hic dolores earum cumque,
+              <br />
+              molestias, voluptates quia eius dignissimos <br />
+              odio minus quibusdam aliquam facilis eligendi consectetur!
+            </p>
+            <a href="" class="see-more">See More<iconify-icon icon="fluent:more-circle-28-regular"></iconify-icon></a>
+          </div>
+
+          <div class="icon-box">
+            <div class="social-glass">
+              <a href="#" aria-label="TikTok">
+                <iconify-icon icon="ic:baseline-tiktok"></iconify-icon>
+              </a>
+
+              <a href="#" aria-label="Facebook">
+                <iconify-icon icon="ic:baseline-facebook"></iconify-icon>
+              </a>
+
+              <a href="#" aria-label="Instagram">
+                <iconify-icon icon="mdi:instagram"></iconify-icon>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-c">
+        <div class="scroll-down">
+          <a href="#product" aria-label="Explore the new collection for 2026">
+            <span class="collection-title">New Collection</span>
+            <span class="collection-row">
+              <span class="collection-arrow" aria-hidden="true">
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                  <path
+                    d="M18 4V31M6 19L18 31L30 19"
+                    stroke="currentColor"
+                    stroke-width="3.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+              <span class="collection-year">2026</span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="product"
+      class="products-section"
+      aria-labelledby="products-title"
+    >
+      <div class="products-shell">
+        <div class="products-heading">
+          <div>
+            <p class="products-eyebrow">THE K-BLOOM COLLECTION</p>
+            <h2 id="products-title">Find your signature scent.</h2>
+            <p class="products-intro">
+              A little floral, a little fresh. Entirely you.
+            </p> 
+          </div>
+          <a class="products-all" href="./products.html"
+            >View All Products <span aria-hidden="true"><iconify-icon icon="akar-icons:arrow-right"></iconify-icon></span></a
+          >
+        </div>
+        <div class="product-categories" aria-label="Perfume categories"></div>
+        <div class="products-toolbar">
+          <p class="products-count" aria-live="polite"></p>
+          <div class="products-arrows">
+            <button
+              type="button"
+              data-scroll="-1"
+              aria-label="Previous products"
+              class="products-arrow-left"
+            >
+              <iconify-icon icon="akar-icons:arrow-left"></iconify-icon></button
+            ><button type="button" data-scroll="1" aria-label="Next products" class="products-arrow-right">
+              <iconify-icon icon="akar-icons:arrow-right"></iconify-icon>
+            </button>
+          </div>
+        </div>
+        <div
+          class="product-list"
+          tabindex="0"
+          role="region"
+          aria-label="Perfumes, scroll horizontally"
+        ></div>
+        <p class="products-note">
+          Discover your next favourite ? Scroll to explore
+          <span aria-hidden="true">?</span>
+        </p>
+        <p class="products-status" role="status"></p>
+      </div>
+    </section>
+    <section id="about" class="about-section" aria-labelledby="about-title">
+      <div class="section-shell about-layout">
+        <div class="about-copy">
+          <div class="about-eyebrow">
+            <p class="products-eyebrow">ABOUT K-BLOOM</p>
+            
+          </div>
+          <h2 id="about-title">Crafted for the moments that bloom beautifully.</h2>
+          <p>
+            K-Bloom is a modern fragrance house inspired by soft florals,
+            glowing botanicals, and the feeling of fresh confidence in every
+            season. We curate clean, expressive perfumes designed to feel as
+            graceful as they smell — elegant, personal, and unforgettable.
+          </p>
+          <div class="about-features" aria-label="Brand highlights">
+            <div class="feature-item">
+              <strong>01</strong>
+              <span>Botanical ingredients</span>
+            </div>
+            <div class="feature-item">
+              <strong>02</strong>
+              <span>Long-lasting blends</span>
+            </div>
+            <div class="feature-item">
+              <strong>03</strong>
+              <span>Luxury in every note</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-media" aria-label="Brand film">
+          <video
+            class="about-video"
+            src="./hailuo-03_A_premium_perfume_bottle_on_a_clean_light_pink_background_soft_studio_lighting_e-0 (1).mp4"
+            autoplay
+            muted
+            loop
+            playsinline
+            poster="./img/dff1e28e5d8071ba56159d70ac7642ef.jpg"
+          ></video>
+          <div class="video-overlay">
+            <span class="video-tag">Hailuo-3 Inspired</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="location" class="location-section" aria-labelledby="location-title">
+      <div class="section-shell location-shell">
+        <div class="location-card">
+          <p class="products-eyebrow">FIND US</p>
+          <h3 id="location-title">Visit our boutique.</h3>
+
+          <div class="location-map" aria-hidden="true">
+            <span class="map-dot"></span>
+          </div>
+
+          <div class="location-detail">
+            <iconify-icon icon="mdi:map-marker-radius"></iconify-icon>
+            <p>19 Bloom Avenue, Yangon, Myanmar</p>
+          </div>
+
+          <div class="location-detail">
+            <iconify-icon icon="mdi:clock-time-four-outline"></iconify-icon>
+            <p>Mon - Sun: 10:00 AM - 8:00 PM</p>
+          </div>
+
+          <a
+            class="location-link"
+            href="https://maps.google.com/?q=19%20Bloom%20Avenue%20Yangon%20Myanmar"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Get directions
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <dialog class="rating-dialog" aria-labelledby="rating-title">
+      <form method="dialog">
+        <button class="rating-close" aria-label="Close rating">?</button>
+      </form>
+      <p class="products-eyebrow">YOUR OPINION MATTERS</p>
+      <h2 id="rating-title">Rate this fragrance</h2>
+      <p class="rating-product"></p>
+      <div class="rating-options" aria-label="Choose your rating"></div>
+      <p class="rating-help">
+        Choose a star to save your rating on this device.
+      </p>
+    </dialog>
+    <script src="./script.js"></script>
+    <script src="./products.js"></script>
+  </body>
+</html>
