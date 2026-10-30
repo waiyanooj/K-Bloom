@@ -902,13 +902,14 @@ header.over-products .navA a {
 }
 .catalog-page {
   background: #fff8f5;
+  padding-top: 30px;
 }
 .catalog-nav {
   display: flex;
   justify-content: space-between;
   gap: 20px;
   width: 90%;
-  margin: 30px auto 0;
+  margin: 0 auto;
   color: #986674;
   font:
     12px "Nunito",
@@ -1158,5 +1159,227 @@ header.over-products .navA a {
     filter: none;
     transform: none;
     transition: none;
+  }
+}
+
+
+.login-page {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 32px clamp(20px, 5vw, 80px);
+  color: #fff;
+  font-family: "Nunito", sans-serif;
+}
+
+.login-page .bg-video {
+  z-index: -2;
+  pointer-events: none;
+}
+
+.login-logo {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  z-index: 2;
+  display: inline-flex;
+  border-radius: 12px;
+}
+
+.login-logo img {
+  display: block;
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.login-logo:focus-visible {
+  outline: 3px solid #fce4ec;
+  outline-offset: 4px;
+}
+
+.login-page:has(.login-logo) {
+  padding-top: 104px;
+}
+
+.login-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, transparent 55%, #30132226 100%);
+  pointer-events: none;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  padding: 28px;
+  border-radius: 24px;
+  background: rgba(255, 217, 0, 0.425);
+  box-shadow: 0 12px 36px #30132226;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.login-card h1,
+.shop-address-card h2 {
+  margin-bottom: 20px;
+  color: #fff;
+  font-family: "Madimi One", sans-serif;
+  font-size: clamp(32px, 6vw, 40px);
+  font-weight: 400;
+  text-align: center;
+}
+
+.shop-address-card h2 {
+  font-size: 30px;
+}
+
+.shop-address-card address {
+  margin-bottom: 16px;
+  font-style: normal;
+  font-weight: 800;
+  text-align: center;
+}
+
+.shop-address-map {
+  display: block;
+  width: 100%;
+  height: 150px;
+  border: 0;
+  border-radius: 12px;
+}
+
+.shop-address-hours {
+  margin: 16px 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.shop-directions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 45px;
+  padding: 12px;
+  border: 1px solid #831159;
+  border-radius: 12px;
+  color: #831159;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.shop-directions:hover {
+  background: #f4e2e8;
+}
+
+.shop-directions:focus-visible {
+  outline: 3px solid #831159;
+  outline-offset: 4px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form label {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.login-form input {
+  width: 100%;
+  min-width: 0;
+  min-height: 45px;
+  margin-bottom: 22px;
+  padding: 12px 14px;
+  border: 1px solid #cba7b7;
+  border-radius: 12px;
+  background: #9b8439c5;
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+}
+
+.login-form input:focus-visible {
+  border-color: #831159;
+  outline: 3px solid #83115933;
+  outline-offset: 2px;
+}
+
+.login-form input::placeholder {
+  color: #cccbcb;
+  opacity: 1;
+}
+
+.login-form button {
+  min-height: 45px;
+  margin-top: 6px;
+  padding: 12px 20px;
+  border: 2px solid rgba(255, 217, 0, 0.637);
+  border-radius: 12px;
+  background: #9b8439c5;
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: "Madimi One", sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.login-form button:active {
+  background: #4e0834;
+}
+
+.login-form button:focus-visible {
+  outline: 3px solid #831159;
+  outline-offset: 4px;
+}
+
+.login-divider {
+  width: 100%;
+  margin: 22px 0;
+  border: 0;
+  border-top: 1px solid #dbc1cb;
+}
+
+.login-form .google-login-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 0;
+  border: 1px solid gold;
+  color: #fff;
+  background: #9b8439c5;
+}
+
+.google-login-button span {
+  display: inline-flex;
+  font-size: 20px;
+}
+
+@media (max-width: 760px) {
+  .login-page {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 24px 16px;
+  }
+
+  .login-card {
+    max-width: 340px;
+    padding: 22px;
   }
 }

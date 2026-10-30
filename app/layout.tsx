@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body>
         {children}
-        <Footer />
+        
         <Script src="https://code.iconify.design/iconify-icon/3.0.3/iconify-icon.min.js" strategy="afterInteractive" />
       </body>
     </html>

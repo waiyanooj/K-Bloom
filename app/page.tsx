@@ -1,6 +1,7 @@
 import ProductCollection from '../components/ProductCollection';
 import HomeEffects from '../components/HomeEffects';
 import CartCount from "../components/CartCount";
+import Footer from '../components/Footer';
 
 
 export default function HomePage() {
@@ -46,16 +47,16 @@ export default function HomePage() {
           <div className="textbox">
             <h1>
               <span className="welcome-line" >
-                <span style={{color: "#c8a2c8"}}>Welcome to K-Bloom ||</span>
+                <span >Welcome to K-Bloom ||</span>
                 <img
                   className="welcome-logo"
                   src="/K_Bloom Perfume Logo.png"
                   alt="K-Bloom Perfume Store logo"
                 />
               </span>
-              <span className="welcome-tagline" style={{color: "#ff0062"}}>Natural Beauty Awaits</span>
+              <span className="welcome-tagline" >Natural Beauty Awaits</span>
             </h1>
-            <div className="spanbar" style={{background: "#ff0062"}}>j</div>
+            <div className="spanbar">j</div>
             <p>
               Lorem ipsum dolor sit amet consectetur, adipisicing elit. <br />
               Quidem qui corrupti quos ratione non hic dolores earum cumque,
@@ -63,7 +64,7 @@ export default function HomePage() {
               molestias, voluptates quia eius dignissimos <br />
               odio minus quibusdam aliquam facilis eligendi consectetur!
             </p>
-            <a href="#about" className="see-more" style={{color: "#ff0062"}}>See More<iconify-icon icon="fluent:more-circle-28-regular"></iconify-icon></a>
+            <a href="#about" className="see-more" >See More<iconify-icon icon="fluent:more-circle-28-regular"></iconify-icon></a>
           </div>
 
           <div className="icon-box">
@@ -194,5 +195,6 @@ export default function HomePage() {
         </div>
       </div>
     </section>
+    <Footer />
   </>);
 }
