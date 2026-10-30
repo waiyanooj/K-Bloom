@@ -248,8 +248,8 @@ export default function ProductCollection({
                       {product.popular ? "POPULAR" : "THE FLORAL EDIT"}
                     </span>
                     <img
-                      src={`/img/perfume-${product.id}.svg`}
-                      alt={`${product.name} perfume bottle illustration`}
+                      src={product.image}
+                      alt={`${product.name} perfume bottle`}
                       width="480"
                       height="480"
                       loading="lazy"

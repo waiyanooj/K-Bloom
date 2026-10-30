@@ -729,6 +729,8 @@ section[id] {
   scrollbar-color: #c995ab #f0e0e6;
 }
 .product-card {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   overflow: hidden;
   border: 1px solid #eedde2;
@@ -737,6 +739,7 @@ section[id] {
   scroll-snap-align: start;
 }
 .product-image {
+  flex-shrink: 0;
   position: relative;
   background: var(--product-tint, #f4e7e7);
 }
@@ -759,6 +762,9 @@ section[id] {
   letter-spacing: 0.5px;
 }
 .product-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   padding: 20px;
 }
 .product-family {
@@ -815,6 +821,7 @@ section[id] {
 }
 .product-add {
   display: flex;
+  margin-top: auto;
   align-items: center;
   justify-content: center;
   gap: 12px;
