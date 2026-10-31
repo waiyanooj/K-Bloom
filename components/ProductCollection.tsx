@@ -5,6 +5,7 @@ import type { CSSProperties } from "react";
 import type { Product } from "../lib/products";
 import { useEffect, useRef, useState } from "react";
 import { categories, products } from "../lib/products";
+import { productDetails } from "../lib/product-details";
 
 type StoredValues = Record<string, number>;
 type ProductStyle = CSSProperties & { "--product-tint": string };
@@ -71,7 +72,16 @@ export default function ProductCollection({
   const [ratings, setRatings] = useState<StoredValues>({});
   const cart = useRef<StoredValues>({});
   const [status, setStatus] = useState("");
+  const [toast, setToast] = useState("");
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [ratingProduct, setRatingProduct] = useState<Product | null>(null);
+  const [previewProduct, setPreviewProduct] = useState<Product | null>(null);
+  const [previewIndex, setPreviewIndex] = useState(0);
+  const previewDialog = useRef<HTMLDialogElement>(null);
+  const previewTrigger = useRef<HTMLButtonElement>(null);
+  const previewImages = previewProduct
+    ? productDetails[previewProduct.id] ?? [previewProduct.image]
+    : [];
   const [arrows, setArrows] = useState({ previous: false, next: false });
   const list = useRef<HTMLDivElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -87,7 +97,16 @@ export default function ProductCollection({
   useEffect(() => {
     setRatings(read("kbloom-ratings"));
     cart.current = read("kbloom-cart");
+    return () => {
+      if (toastTimer.current !== null) clearTimeout(toastTimer.current);
+    };
   }, []);
+
+  function dismissToast() {
+    if (toastTimer.current !== null) clearTimeout(toastTimer.current);
+    toastTimer.current = null;
+    setToast("");
+  }
 
   useEffect(() => {
     const element = list.current;
@@ -114,6 +133,14 @@ export default function ProductCollection({
     if (ratingProduct) dialog.current?.showModal();
   }, [ratingProduct]);
 
+  useEffect(() => {
+    if (!previewProduct) return;
+    previewDialog.current?.showModal();
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = overflow; };
+  }, [previewProduct]);
+
   function add(product: Product) {
    const count = Number(cart.current[product.id]);
 
@@ -131,10 +158,19 @@ export default function ProductCollection({
     new CustomEvent<number>("cart-updated", { detail: total }),
   );
 
-  setStatus(
-    `${product.name} added to cart (${cart.current[product.id]}). ${
+  const message = `${product.name.trim()} added to cart (${cart.current[product.id]}). ${
       persisted ? "Saved on this device." : "Saved for this visit only."
-    }`,);
+    }`;
+  if (catalog) {
+    if (toastTimer.current !== null) clearTimeout(toastTimer.current);
+    setToast(message);
+    toastTimer.current = setTimeout(() => {
+      setToast("");
+      toastTimer.current = null;
+    }, 5000);
+  } else {
+    setStatus(message);
+  }
   }
 
   function rate(value: number) {
@@ -162,6 +198,15 @@ export default function ProductCollection({
 
   return (
     <>
+      {catalog && (
+        <div className={`cart-toast${toast ? " is-visible" : ""}`}>
+          <span className="cart-toast-check" aria-hidden="true">✓</span>
+          <p role="status" aria-live="polite" aria-atomic="true">{toast}</p>
+          {toast && (
+            <button type="button" onClick={dismissToast} aria-label="Dismiss notification">×</button>
+          )}
+        </div>
+      )}
       <section
         id="product"
         className="products-section"
@@ -243,7 +288,18 @@ export default function ProductCollection({
               };
               return (
                 <article key={product.id} className="product-card">
-                  <div className="product-image" style={productStyle}>
+                  <button
+                    type="button"
+                    className="product-image product-image-trigger"
+                    style={productStyle}
+                    aria-label={`View ${product.name.trim()} details`}
+                    aria-haspopup="dialog"
+                    onClick={(event) => {
+                      previewTrigger.current = event.currentTarget;
+                      setPreviewIndex(0);
+                      setPreviewProduct(product);
+                    }}
+                  >
                     <span className="product-badge">
                       {product.popular ? "POPULAR" : "THE FLORAL EDIT"}
                     </span>
@@ -254,7 +310,8 @@ export default function ProductCollection({
                       height="480"
                       loading="lazy"
                     />
-                  </div>
+                    <span className="product-image-hint">View details ↗</span>
+                  </button>
                   <div className="product-info">
                     <p className="product-family">
                       {product.family} / Eau de parfum
@@ -284,7 +341,7 @@ export default function ProductCollection({
                     </div>
                     <p className="product-price">
                       {product.price.toLocaleString("en-US")}{" "}
-                      <small>MMK / 50 ml</small>
+                      <small>MMK / {product.priceLabel ?? "Full size"}</small>
                     </p>
                     <button
                       type="button"
@@ -308,6 +365,44 @@ export default function ProductCollection({
           </p>
         </div>
       </section>
+      <dialog
+        ref={previewDialog}
+        className="product-preview"
+        aria-labelledby="product-preview-title"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) {
+            const bounds = event.currentTarget.getBoundingClientRect();
+            if (event.clientX < bounds.left || event.clientX > bounds.right ||
+                event.clientY < bounds.top || event.clientY > bounds.bottom) {
+              event.currentTarget.close();
+            }
+          }
+        }}
+        onClose={() => {
+          setPreviewProduct(null);
+          previewTrigger.current?.focus({ preventScroll: true });
+        }}
+      >
+        <div className="product-preview-header">
+          <h2 id="product-preview-title">{previewProduct?.name.trim()}</h2>
+          <button type="button" className="product-preview-close"
+            aria-label="Close product details" autoFocus
+            onClick={() => previewDialog.current?.close()}>×</button>
+        </div>
+        {previewProduct && (
+          <img className="product-preview-image" src={previewImages[previewIndex]}
+            alt={`${previewProduct.name.trim()} — product and price details, image ${previewIndex + 1}`}
+          />
+        )}
+        {previewImages.length > 1 && (
+          <div className="product-preview-options" aria-label="Product images">
+            {previewImages.map((src, index) => (
+              <button key={src} type="button" aria-pressed={previewIndex === index}
+                onClick={() => setPreviewIndex(index)}>Image {index + 1}</button>
+            ))}
+          </div>
+        )}
+      </dialog>
       <dialog
         ref={dialog}
         className="rating-dialog"
