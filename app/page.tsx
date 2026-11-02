@@ -30,7 +30,7 @@ export default function HomePage() {
           </div>
 
           <div className="cardB">
-            <a href="#" className='cart-link' aria-label='Cart'><iconify-icon icon="akar-icons:cart"></iconify-icon> <CartCount/> </a>
+            <a href="/cart" className='cart-link' aria-label='Cart'><iconify-icon icon="akar-icons:cart"></iconify-icon> <CartCount/> </a>
             <a href="#"
               ><iconify-icon icon="iconamoon:profile-fill"></iconify-icon></a>
           </div>

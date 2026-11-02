@@ -69,12 +69,14 @@ export default function ProductCollection({
   const [selected, setSelected] = useState(
     catalog ? "All Perfumes" : "Popular Products",
   );
-  const [ratings, setRatings] = useState<StoredValues>({});
   const cart = useRef<StoredValues>({});
+  const [query, setQuery] = useState("");
+  const searchTerms = query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
   const [status, setStatus] = useState("");
+  const [addedProduct, setAddedProduct] = useState<string | null>(null);
+  const addedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [toast, setToast] = useState("");
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [ratingProduct, setRatingProduct] = useState<Product | null>(null);
   const [previewProduct, setPreviewProduct] = useState<Product | null>(null);
   const [previewIndex, setPreviewIndex] = useState(0);
   const previewDialog = useRef<HTMLDialogElement>(null);
@@ -84,21 +86,22 @@ export default function ProductCollection({
     : [];
   const [arrows, setArrows] = useState({ previous: false, next: false });
   const list = useRef<HTMLDivElement>(null);
-  const dialog = useRef<HTMLDialogElement>(null);
-  const ratingTrigger = useRef<HTMLButtonElement>(null);
   const visible = products.filter(
     (product) =>
-      selected === "All Perfumes" ||
+      (selected === "All Perfumes" ||
       (selected === "Popular Products"
         ? product.popular
-        : product.family === selected),
+        : product.family === selected)) &&
+      searchTerms.every((term) =>
+        `${product.name} ${product.notes} ${product.family}`.toLocaleLowerCase().includes(term),
+      ),
   );
 
   useEffect(() => {
-    setRatings(read("kbloom-ratings"));
     cart.current = read("kbloom-cart");
     return () => {
       if (toastTimer.current !== null) clearTimeout(toastTimer.current);
+      if (addedTimer.current !== null) clearTimeout(addedTimer.current);
     };
   }, []);
 
@@ -127,11 +130,7 @@ export default function ProductCollection({
       element.removeEventListener("scroll", update);
       observer.disconnect();
     };
-  }, [selected]);
-
-  useEffect(() => {
-    if (ratingProduct) dialog.current?.showModal();
-  }, [ratingProduct]);
+  }, [selected, query]);
 
   useEffect(() => {
     if (!previewProduct) return;
@@ -142,6 +141,9 @@ export default function ProductCollection({
   }, [previewProduct]);
 
   function add(product: Product) {
+   if (addedTimer.current !== null) clearTimeout(addedTimer.current);
+   setAddedProduct(product.id);
+   addedTimer.current = setTimeout(() => setAddedProduct(null), 2000);
    const count = Number(cart.current[product.id]);
 
   cart.current[product.id] =
@@ -171,17 +173,6 @@ export default function ProductCollection({
   } else {
     setStatus(message);
   }
-  }
-
-  function rate(value: number) {
-    if (!ratingProduct) return;
-    const updated = { ...ratings, [ratingProduct.id]: value };
-    setRatings(updated);
-    const persisted = save("kbloom-ratings", updated);
-    setStatus(
-      `Thank you! You rated ${ratingProduct.name} ${value}/5. ${persisted ? "Saved on this device." : "Saved for this visit only."}`,
-    );
-    dialog.current?.close();
   }
 
   function scroll(direction: -1 | 1) {
@@ -216,12 +207,12 @@ export default function ProductCollection({
           <div className="products-heading">
             <div>
               <p className="products-eyebrow">THE K-BLOOM COLLECTION</p>
-              <h2 id="products-title">
-                {catalog ? "All fragrances." : "Find your signature scent."}
+              <h2 id="products-title" style={{"fontSize" : "45px"}}>
+                {catalog ? <>A scent. <em>A whole mood.</em></> : "Find your signature scent."}
               </h2>
-              <p className="products-intro">
-                A little floral, a little fresh. Entirely you.
-              </p>
+              {/* <p className="products-intro">
+                {catalog ? "Explore the fragrance edit. Find the one that feels like you." : "A little floral, a little fresh. Entirely you."}
+              </p> */}
             </div>
             <Link
               className="products-all"
@@ -231,6 +222,7 @@ export default function ProductCollection({
               <span aria-hidden="true">→</span>
             </Link>
           </div>
+          <div className={catalog ? "catalog-filters" : undefined}>
           <div className="product-categories" aria-label="Perfume categories">
             {[...categories, ...(catalog ? ["All Perfumes"] : [])].map(
               (category) => (
@@ -244,6 +236,16 @@ export default function ProductCollection({
                 </button>
               ),
             )}
+          </div>
+          {catalog && (
+            <label className="product-search">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+                <circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 5 5" />
+              </svg>
+              <input type="search" value={query} onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search fragrances…" aria-label="Search fragrances by name or scent notes" />
+            </label>
+          )}
           </div>
           <div className="products-toolbar">
             <p className="products-count" aria-live="polite">
@@ -279,15 +281,20 @@ export default function ProductCollection({
               catalog ? "All perfumes" : "Perfumes, scroll horizontally"
             }
           >
-            {visible.map((product) => {
-              const rating = Number(ratings[product.id]);
-              const valid =
-                Number.isInteger(rating) && rating >= 1 && rating <= 5;
+            {visible.length === 0 && (
+              <div className="products-empty">
+                <h3>No fragrances found</h3>
+                <p>Try another name, scent note, or category.</p>
+                <button type="button" onClick={() => { setQuery(""); setSelected("All Perfumes"); }}>Show all fragrances</button>
+              </div>
+            )}
+            {visible.map((product, index) => {
               const productStyle: ProductStyle = {
                 "--product-tint": product.tint,
               };
               return (
-                <article key={product.id} className="product-card">
+                <article key={product.id} className="product-card" style={productStyle}>
+                  {catalog && <span className="catalog-product-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>}
                   <button
                     type="button"
                     className="product-image product-image-trigger"
@@ -301,7 +308,7 @@ export default function ProductCollection({
                     }}
                   >
                     <span className="product-badge">
-                      {product.popular ? "POPULAR" : "THE FLORAL EDIT"}
+                      {product.popular ? "BEST LOVED" : "SCENT EDIT"}
                     </span>
                     <img
                       src={product.image}
@@ -310,47 +317,31 @@ export default function ProductCollection({
                       height="480"
                       loading="lazy"
                     />
-                    <span className="product-image-hint">View details ↗</span>
+                    <span className="product-image-hint" aria-hidden="true">↗</span>
                   </button>
                   <div className="product-info">
                     <p className="product-family">
-                      {product.family} / Eau de parfum
+                      <span>{product.family}</span><span>Eau de parfum</span>
                     </p>
                     <h3>{product.name}</h3>
                     <p className="product-notes">{product.notes}</p>
-                    <div className="product-rating">
-                      <span className="product-stars" aria-hidden="true">
-                        {valid
-                          ? "★".repeat(rating) + "☆".repeat(5 - rating)
-                          : "☆☆☆☆☆"}
-                      </span>
-                      <span>
-                        {valid ? `Your rating: ${rating}/5` : "Not rated yet"}
-                      </span>
-                      <button
-                        type="button"
-                        className="product-rate"
-                        aria-label={`Rate ${product.name}`}
-                        onClick={(event) => {
-                          ratingTrigger.current = event.currentTarget;
-                          setRatingProduct(product);
-                        }}
-                      >
-                        Rate
-                      </button>
-                    </div>
+                    <div className="product-purchase">
                     <p className="product-price">
                       {product.price.toLocaleString("en-US")}{" "}
                       <small>MMK / {product.priceLabel ?? "Full size"}</small>
                     </p>
                     <button
                       type="button"
-                      className="product-add"
+                      className={`product-add${addedProduct === product.id ? " is-added" : ""}`}
                       aria-label={`Add ${product.name} to cart`}
                       onClick={() => add(product)}
                     >
-                      <span aria-hidden="true">＋</span> Add to Cart
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        {addedProduct === product.id ? <path d="m5 12 4 4L19 6" /> : <><path d="M6 7h12l2 14H4L6 7Z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" /></>}
+                      </svg>
+                      {addedProduct === product.id ? "Added" : "Add to Cart"}
                     </button>
+                    </div>
                   </div>
                 </article>
               );
@@ -402,39 +393,6 @@ export default function ProductCollection({
             ))}
           </div>
         )}
-      </dialog>
-      <dialog
-        ref={dialog}
-        className="rating-dialog"
-        aria-labelledby="rating-title"
-        onClose={() => {
-          setRatingProduct(null);
-          ratingTrigger.current?.focus({ preventScroll: true });
-        }}
-      >
-        <form method="dialog">
-          <button className="rating-close" aria-label="Close rating">
-            ×
-          </button>
-        </form>
-        <p className="products-eyebrow">YOUR OPINION MATTERS</p>
-        <h2 id="rating-title">Rate this fragrance</h2>
-        <p className="rating-product">{ratingProduct?.name}</p>
-        <div className="rating-options" aria-label="Choose your rating">
-          {[1, 2, 3, 4, 5].map((value) => (
-            <button
-              key={value}
-              type="button"
-              aria-label={`${value} ${value === 1 ? "star" : "stars"}`}
-              onClick={() => rate(value)}
-            >
-              ☆
-            </button>
-          ))}
-        </div>
-        <p className="rating-help">
-          Choose a star to save your rating on this device.
-        </p>
       </dialog>
     </>
   );

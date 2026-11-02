@@ -12,7 +12,7 @@ export default function ProductsPage() {
       <nav className="catalog-nav" aria-label="Catalog navigation">
         <Link href="/">← K-Bloom Home</Link>
         <span>THE FRAGRANCE EDIT</span>
-        <div className="cart-link catalog-cart" title="Shopping cart">
+        <Link href="/cart" className="cart-link catalog-cart" aria-label="Shopping cart">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"
             strokeLinejoin="round" aria-hidden="true">
@@ -21,7 +21,7 @@ export default function ProductsPage() {
             <circle cx="18" cy="20" r="1" />
           </svg>
           <CartCount />
-        </div>
+        </Link>
       </nav>
       <ProductCollection catalog />
       <Footer />
