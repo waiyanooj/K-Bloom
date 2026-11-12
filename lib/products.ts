@@ -8,6 +8,8 @@ export interface Product {
   tint: string;
   popular: boolean;
   image: string;
+  detailImages?: string[];
+  sizePrices?: Record<"5ml" | "10ml" | "30ml" | "50ml", number>;
 }
 
 export const products: Product[] = [

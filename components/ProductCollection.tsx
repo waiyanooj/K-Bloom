@@ -4,72 +4,25 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import type { Product } from "../lib/products";
 import { useEffect, useRef, useState } from "react";
-import { categories, products } from "../lib/products";
-import { productDetails } from "../lib/product-details";
+import { categories } from "../lib/products";
+import { useProducts } from "./ProductProvider";
 
-type StoredValues = Record<string, number>;
+import { cartKey, readCart, writeCart, type Cart } from "../lib/cart";
+import { sizeLabel, sizePrice, type ProductSize } from "../lib/product-sizes";
+import SizeSelect from "./SizeSelect";
 type ProductStyle = CSSProperties & { "--product-tint": string };
-
-function read(key: string): StoredValues {
-  try {
-    const value: unknown = JSON.parse(localStorage.getItem(key) || "{}");
-    if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-    return Object.fromEntries(
-      Object.entries(value).flatMap(([id, stored]) => {
-        if (typeof stored !== "number" && typeof stored !== "string") return [];
-        const number = Number(stored);
-        return Number.isSafeInteger(number) && number > 0 ? [[id, number]] : [];
-      }),
-    );
-  } catch {
-    return {};
-  }
-}
-
-function save(key: string, value: StoredValues) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-    return true;
-  } catch {
-    return false;
-  }
-}
-// Add to Cart 
-// function add(product: Product) {
-//   const cart = useRef<Record<string, number>>({});
-//   const [status, setStatus] = useState("");
-//   const count = Number(cart.current[product.id]);
-
-//   cart.current[product.id] =
-//     (Number.isSafeInteger(count) && count > 0 ? count : 0) + 1;
-
-//   const persisted = save("kbloom-cart", cart.current);
-
-//   const total = Object.values(cart.current).reduce(
-//     (sum, quantity) => sum + quantity,
-//     0,
-//   );
-
-//   window.dispatchEvent(
-//     new CustomEvent<number>("cart-updated", { detail: total }),
-//   );
-
-//   setStatus(
-//     `${product.name} added to cart (${cart.current[product.id]}). ${
-//       persisted ? "Saved on this device." : "Saved for this visit only."
-//     }`,
-//   );
-// }
 
 export default function ProductCollection({
   catalog = false,
 }: {
   catalog?: boolean;
 }) {
+  const { products, loaded } = useProducts();
   const [selected, setSelected] = useState(
     catalog ? "All Perfumes" : "Popular Products",
   );
-  const cart = useRef<StoredValues>({});
+  const cart = useRef<Cart>({});
+  const [sizes, setSizes] = useState<Record<string, ProductSize>>({});
   const [query, setQuery] = useState("");
   const searchTerms = query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
   const [status, setStatus] = useState("");
@@ -81,9 +34,11 @@ export default function ProductCollection({
   const [previewIndex, setPreviewIndex] = useState(0);
   const previewDialog = useRef<HTMLDialogElement>(null);
   const previewTrigger = useRef<HTMLButtonElement>(null);
-  const previewImages = previewProduct
-    ? productDetails[previewProduct.id] ?? [previewProduct.image]
+  const currentPreviewProduct = products.find((product) => product.id === previewProduct?.id) ?? previewProduct;
+  const previewImages = currentPreviewProduct
+    ? currentPreviewProduct.detailImages?.length ? currentPreviewProduct.detailImages : [currentPreviewProduct.image]
     : [];
+  const safePreviewIndex = Math.min(previewIndex, Math.max(0, previewImages.length - 1));
   const [arrows, setArrows] = useState({ previous: false, next: false });
   const list = useRef<HTMLDivElement>(null);
   const visible = products.filter(
@@ -98,7 +53,7 @@ export default function ProductCollection({
   );
 
   useEffect(() => {
-    cart.current = read("kbloom-cart");
+    cart.current = readCart();
     return () => {
       if (toastTimer.current !== null) clearTimeout(toastTimer.current);
       if (addedTimer.current !== null) clearTimeout(addedTimer.current);
@@ -130,7 +85,7 @@ export default function ProductCollection({
       element.removeEventListener("scroll", update);
       observer.disconnect();
     };
-  }, [selected, query]);
+  }, [selected, query, products]);
 
   useEffect(() => {
     if (!previewProduct) return;
@@ -144,25 +99,12 @@ export default function ProductCollection({
    if (addedTimer.current !== null) clearTimeout(addedTimer.current);
    setAddedProduct(product.id);
    addedTimer.current = setTimeout(() => setAddedProduct(null), 2000);
-   const count = Number(cart.current[product.id]);
-
-  cart.current[product.id] =
-    (Number.isSafeInteger(count) && count > 0 ? count : 0) + 1;
-
-  const persisted = save("kbloom-cart", cart.current);
-
-  const total = Object.values(cart.current).reduce(
-    (sum, quantity) => sum + quantity,
-    0,
-  );
-
-  window.dispatchEvent(
-    new CustomEvent<number>("cart-updated", { detail: total }),
-  );
-
-  const message = `${product.name.trim()} added to cart (${cart.current[product.id]}). ${
-      persisted ? "Saved on this device." : "Saved for this visit only."
-    }`;
+   const size = sizes[product.id] ?? "full";
+   const key = cartKey(product.id, size);
+   cart.current = readCart();
+   cart.current[key] = (cart.current[key] || 0) + 1;
+   const persisted = writeCart(cart.current);
+   const message = `${product.name.trim()} (${sizeLabel(product, size)}) added to cart (${cart.current[key]}). ${persisted ? "Saved on this device." : "Changes could not be saved on this device."}`;
   if (catalog) {
     if (toastTimer.current !== null) clearTimeout(toastTimer.current);
     setToast(message);
@@ -251,6 +193,8 @@ export default function ProductCollection({
             <p className="products-count" aria-live="polite">
               {selected} / {visible.length} fragrances
             </p>
+          </div>
+          <div className={catalog ? undefined : "products-carousel"}>
             <div className="products-arrows">
               <button
                 type="button"
@@ -259,7 +203,9 @@ export default function ProductCollection({
                 disabled={!arrows.previous}
                 onClick={() => scroll(-1)}
               >
-                ←
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="m15 6-6 6 6 6" />
+                </svg>
               </button>
               <button
                 type="button"
@@ -268,10 +214,11 @@ export default function ProductCollection({
                 disabled={!arrows.next}
                 onClick={() => scroll(1)}
               >
-                →
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="m9 6 6 6-6 6" />
+                </svg>
               </button>
             </div>
-          </div>
           <div
             ref={list}
             className="product-list"
@@ -283,12 +230,13 @@ export default function ProductCollection({
           >
             {visible.length === 0 && (
               <div className="products-empty">
-                <h3>No fragrances found</h3>
+                <h3>{loaded ? "No fragrances found" : "Loading fragrances…"}</h3>
                 <p>Try another name, scent note, or category.</p>
                 <button type="button" onClick={() => { setQuery(""); setSelected("All Perfumes"); }}>Show all fragrances</button>
               </div>
             )}
             {visible.map((product, index) => {
+              const size = sizes[product.id] ?? "full";
               const productStyle: ProductStyle = {
                 "--product-tint": product.tint,
               };
@@ -326,9 +274,13 @@ export default function ProductCollection({
                     <h3>{product.name}</h3>
                     <p className="product-notes">{product.notes}</p>
                     <div className="product-purchase">
+                    <SizeSelect product={product} value={size} onChange={(value) => {
+                      setSizes((current) => ({ ...current, [product.id]: value }));
+                      setAddedProduct(null);
+                    }} />
                     <p className="product-price">
-                      {product.price.toLocaleString("en-US")}{" "}
-                      <small>MMK / {product.priceLabel ?? "Full size"}</small>
+                      {sizePrice(product, size).toLocaleString("en-US")}{" "}
+                      <small>MMK / {sizeLabel(product, size)}</small>
                     </p>
                     <button
                       type="button"
@@ -346,6 +298,7 @@ export default function ProductCollection({
                 </article>
               );
             })}
+          </div>
           </div>
           <p className="products-note">
             Discover your next favourite · Scroll to explore{" "}
@@ -381,7 +334,7 @@ export default function ProductCollection({
             onClick={() => previewDialog.current?.close()}>×</button>
         </div>
         {previewProduct && (
-          <img className="product-preview-image" src={previewImages[previewIndex]}
+          <img className="product-preview-image" src={previewImages[safePreviewIndex]}
             alt={`${previewProduct.name.trim()} — product and price details, image ${previewIndex + 1}`}
           />
         )}

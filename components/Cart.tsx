@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { products } from "../lib/products";
+import { cartItems, changeCartSize } from "../lib/cart";
+import { sizeLabel } from "../lib/product-sizes";
+import SizeSelect from "./SizeSelect";
+import { useProducts } from "./ProductProvider";
 import {
   CART_KEY,
   readCart,
@@ -13,6 +16,7 @@ import {
 const money = (value: number) => `${value.toLocaleString("en-US")} MMK`;
 
 export default function Cart() {
+  const { products, loaded } = useProducts();
   const [cart, setCart] = useState<CartValues>({});
   const [ready, setReady] = useState(false);
   const [status, setStatus] = useState("");
@@ -35,12 +39,9 @@ export default function Cart() {
     return () => window.removeEventListener("storage", sync);
   }, []);
 
-  const items = products.filter((product) => cart[product.id] > 0);
-  const count = items.reduce((sum, product) => sum + cart[product.id], 0);
-  const subtotal = items.reduce(
-    (sum, product) => sum + product.price * cart[product.id],
-    0,
-  );
+  const items = cartItems(cart, products);
+  const count = items.reduce((sum, item) => sum + item.quantity, 0);
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   function update(next: CartValues, message: string) {
     setCart(next);
@@ -55,30 +56,6 @@ export default function Cart() {
     setRemoved({ id, quantity: next[id] });
     delete next[id];
     update(next, "Fragrance removed from your bag.");
-  }
-
-  function downloadSummary() {
-    const summary = [
-      "K-Bloom — Your fragrance selection",
-      "",
-      ...items.map(
-        (product) =>
-          `${product.name.trim()} × ${cart[product.id]} — ${money(product.price * cart[product.id])}`,
-      ),
-      "",
-      `Items subtotal: ${money(subtotal)}`,
-      "Delivery and final total to be confirmed with the store.",
-      "This is a saved selection, not a confirmed order.",
-    ].join("\n");
-    const url = URL.createObjectURL(
-      new Blob([summary], { type: "text/plain;charset=utf-8" }),
-    );
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "K-Bloom-selection.txt";
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    setStatus("Your selection summary has been downloaded.");
   }
 
   return (
@@ -116,7 +93,7 @@ export default function Cart() {
           </button>
         )}
       </div>
-      {!ready ? (
+      {!ready || !loaded ? (
         <p className="bag-empty" role="status">
           Loading your bag…
         </p>
@@ -138,10 +115,10 @@ export default function Cart() {
               <span>FRAGRANCE / {items.length} selections</span>
               <span>YOUR EDIT</span>
             </div>
-            {items.map((product) => (
+            {items.map(({ key, product, size, price, quantity }) => (
               <article
                 className="bag-item"
-                key={product.id}
+                key={key}
                 aria-label={product.name.trim()}
               >
                 <div
@@ -163,8 +140,11 @@ export default function Cart() {
                   </p>
                   <h2>{product.name.trim()}</h2>
                   <p className="bag-unit-price">
-                    {money(product.price)} / {product.priceLabel ?? "Full size"}
+                    {money(price)} / {sizeLabel(product, size)}
                   </p>
+                  <SizeSelect product={product} value={size} onChange={(value) => {
+                    update(changeCartSize(cart, key, value, products), "Size and price updated.");
+                  }} />
                   <div className="bag-item-actions">
                     <div
                       className="bag-quantity"
@@ -173,27 +153,27 @@ export default function Cart() {
                     >
                       <button
                         type="button"
-                        disabled={cart[product.id] <= 1}
+                        disabled={cart[key] <= 1}
                         aria-label={`Decrease ${product.name.trim()} quantity`}
                         onClick={() =>
                           update(
-                            { ...cart, [product.id]: cart[product.id] - 1 },
+                            { ...cart, [key]: cart[key] - 1 },
                             "Quantity updated.",
                           )
                         }
                       >
                         −
                       </button>
-                      <span aria-label={`Quantity: ${cart[product.id]}`}>
-                        {cart[product.id]}
+                      <span aria-label={`Quantity: ${cart[key]}`}>
+                        {cart[key]}
                       </span>
                       <button
                         type="button"
-                        disabled={cart[product.id] >= 99}
+                        disabled={cart[key] >= 99}
                         aria-label={`Increase ${product.name.trim()} quantity`}
                         onClick={() =>
                           update(
-                            { ...cart, [product.id]: cart[product.id] + 1 },
+                            { ...cart, [key]: cart[key] + 1 },
                             "Quantity updated.",
                           )
                         }
@@ -205,14 +185,14 @@ export default function Cart() {
                       className="bag-remove"
                       type="button"
                       aria-label={`Remove ${product.name.trim()}`}
-                      onClick={() => remove(product.id)}
+                      onClick={() => remove(key)}
                     >
                       Remove
                     </button>
                   </div>
                 </div>
                 <p className="bag-line-total">
-                  {money(product.price * cart[product.id])}
+                  {money(price * quantity)}
                 </p>
               </article>
             ))}
@@ -222,7 +202,7 @@ export default function Cart() {
           </div>
           <aside className="bag-summary" aria-labelledby="bag-summary-title">
             <p className="bag-eyebrow">THE FINISHING TOUCH</p>
-            <h2 id="bag-summary-title">Your selection.</h2>
+            <h2 id="bag-summary-title">Order detail</h2>
             <dl>
               <div>
                 <dt>Items ({count})</dt>
@@ -238,16 +218,12 @@ export default function Cart() {
               <strong>{money(subtotal)}</strong>
             </div>
             <p className="bag-summary-note">
-              Delivery and final total are confirmed with the store. Online
-              checkout is not available yet.
+              Add your delivery details on the payment page. Delivery and final
+              total are confirmed with the store.
             </p>
-            <button
-              type="button"
-              className="bag-primary"
-              onClick={downloadSummary}
-            >
-              Save selection <span aria-hidden="true">↓</span>
-            </button>
+            <Link className="bag-primary" href="/payment">
+              Continue to payment <span aria-hidden="true">→</span>
+            </Link>
             <Link className="bag-visit" href="/#location">
               Visit our boutique ↗
             </Link>

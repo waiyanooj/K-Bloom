@@ -2,22 +2,10 @@
 
 import { useEffect, useState } from "react";
 
+import { readCart } from "../lib/cart";
+
 function readCartCount(): number {
-    try{
-        const cart: unknown = JSON.parse(localStorage.getItem("kbloom-cart") || "{}");
-
-        if(!cart || typeof cart != "object" || Array.isArray(cart)) return 0;
-
-        return Object.values(cart).reduce<number>((total, value) => {
-            if(typeof value != "number" && typeof value != "string") return total;
-
-            const quantity = Number(value);
-
-            return Number.isSafeInteger(quantity) && quantity > 0 ? total + quantity : total;
-        },0)
-    }catch{
-        return 0;
-    }
+    return Object.values(readCart()).reduce((sum, quantity) => sum + quantity, 0);
 }
 
 export default function CartCount(){
