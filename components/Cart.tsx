@@ -63,7 +63,7 @@ export default function Cart() {
       <div className="bag-heading">
         <div>
           <p className="bag-eyebrow">YOUR PERSONAL EDIT</p>
-          <h1 id="bag-title" style={{ fontSize: "45px" }}>
+          <h1 id="bag-title">
             Good scents. <em>Great choices.</em>
           </h1>
         </div>

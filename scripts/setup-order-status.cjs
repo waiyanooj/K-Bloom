@@ -208,7 +208,9 @@ async function main() {
           r.booleanRule?.condition?.values?.[0]?.userEnteredValue === f &&
           r.booleanRule.format.textFormat?.foregroundColor != null &&
           ["red", "green", "blue"].every(
-            (channel) => (r.booleanRule.format.textFormat.foregroundColor[channel] ?? 0) === 0,
+            (channel) =>
+              (r.booleanRule.format.textFormat.foregroundColor[channel] ??
+                0) === 0,
           ) &&
           Object.entries(colors[i]).every(
             ([key, value]) =>

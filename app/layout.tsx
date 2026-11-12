@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Footer from "../components/Footer";
 import "./globals.css";
+import "./responsive.css";
 import ProductProvider from "../components/ProductProvider";
 
 export const metadata: Metadata = {

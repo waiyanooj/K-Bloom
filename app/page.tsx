@@ -1,7 +1,7 @@
 import Icon from "../components/Icon";
 import ProductCollection from "../components/ProductCollection";
 import HomeEffects from "../components/HomeEffects";
-import CartCount from "../components/CartCount";
+import HomeHeader from "../components/HomeHeader";
 import Footer from "../components/Footer";
 import DeliveryInfo from "../components/DeliveryInfo";
 
@@ -10,35 +10,7 @@ export default function HomePage() {
     <>
       <HomeEffects />
 
-      <header>
-        <nav>
-          <div className="logo">
-            <div className="logoImg">
-              <img src="/K_Bloom Perfume Logo.png" alt="K-Bloom Logo" />
-            </div>
-            <h4>K-Bloom</h4>
-          </div>
-
-          <div className="navbar">
-            <div className="navA">
-              <a href="#home">Home</a>
-              <a href="#product">Product</a>
-              <a href="#about">About</a>
-              <a href="#location">Location</a>
-            </div>
-
-            <div className="cardB">
-              <a href="/cart" className="cart-link" aria-label="Cart">
-                <Icon icon="akar-icons:cart" />{" "}
-                <CartCount />{" "}
-              </a>
-              <a href="#">
-                <Icon icon="iconamoon:profile-fill" />
-              </a>
-            </div>
-          </div>
-        </nav>
-      </header>
+      <HomeHeader />
       <section id="home" className="home">
         <video autoPlay muted loop playsInline className="bg-video">
           <source src="/video/K-Bloom.mp4" type="video/mp4" />
@@ -49,7 +21,7 @@ export default function HomePage() {
             <div className="textbox">
               <h1>
                 <span className="welcome-line">
-                  <span>Welcome to K-Bloom ||</span>
+                  <span>Welcome to K-Bloom</span>
                   <img
                     className="welcome-logo"
                     src="/K_Bloom Perfume Logo.png"
@@ -58,32 +30,47 @@ export default function HomePage() {
                 </span>
                 <span className="welcome-tagline">Natural Beauty Awaits</span>
               </h1>
-              <div className="spanbar">j</div>
               <p>
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. <br />
-                Quidem qui corrupti quos ratione non hic dolores earum cumque,
-                <br />
-                molestias, voluptates quia eius dignissimos <br />
-                odio minus quibusdam aliquam facilis eligendi consectetur!
+                Soft florals. Fresh beginnings. Discover your signature scent
+                and make every day a little more you.
               </p>
               <a href="#about" className="see-more">
-                See More
-                <Icon icon="fluent:more-circle-28-regular" />
+                Our story
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14m-6-6 6 6-6 6" />
+                </svg>
               </a>
             </div>
 
             <div className="icon-box">
+              <span className="social-label">Follow along</span>
               <div className="social-glass">
-                <a href="#" aria-label="TikTok">
+                <a
+                  href="https://www.tiktok.com/@k_bloom_2026?is_from_webapp=1&sender_device=pc"
+                  aria-label="TikTok"
+                >
                   <Icon icon="ic:baseline-tiktok" />
                 </a>
 
-                <a href="#" aria-label="Facebook">
-                  <Icon icon="ic:baseline-facebook" />
+                <a href="ဋ" aria-label="Facebook">
+                  <Icon icon="ic:baseline-tiktok" />
                 </a>
 
-                <a href="#" aria-label="Instagram">
-                  <Icon icon="mdi:instagram" />
+                <a
+                  href="https://www.facebook.com/share/1Gv7npto3o/"
+                  aria-label="Instagram"
+                >
+                  <Icon icon="ic:baseline-facebook" />
                 </a>
               </div>
             </div>
@@ -93,20 +80,19 @@ export default function HomePage() {
         <div className="container-c">
           <div className="scroll-down">
             <a href="#product" aria-label="Explore the new collection for 2026">
-              <span className="collection-title">New Collection</span>
-              <span className="collection-row">
-                <span className="collection-arrow" aria-hidden="true">
-                  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                    <path
-                      d="M18 4V31M6 19L18 31L30~ 19"
-                      stroke="currentColor"
-                      strokeWidth="3.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-                <span className="collection-year">2026</span>
+              <span className="collection-title">
+                New Collection <span className="collection-year">2026</span>
+              </span>
+              <span className="collection-arrow" aria-hidden="true">
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                  <path
+                    d="M18 4V31M6 19L18 31L30 19"
+                    stroke="currentColor"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </span>
             </a>
           </div>
@@ -128,10 +114,11 @@ export default function HomePage() {
               Crafted for the moments that bloom beautifully.
             </h2>
             <p>
-              K-Bloom is a modern fragrance house inspired by soft florals,
-              glowing botanicals, and the feeling of fresh confidence in every
-              season. We curate clean, expressive perfumes designed to feel as
-              graceful as they smell — elegant, personal, and unforgettable.
+              Every fragrance tells a story. From delicate florals and bright
+              citrus to warm, lingering woods, K-Bloom brings together scents to
+              complement your mood and make everyday moments feel special. Find
+              the notes that feel like you, and leave a beautiful impression
+              wherever you go.
             </p>
             <div className="about-features" aria-label="Brand highlights">
               <div className="feature-item">
