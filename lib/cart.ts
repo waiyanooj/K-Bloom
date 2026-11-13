@@ -1,5 +1,5 @@
 import type { Product } from "./products";
-import { isProductSize, sizePrice, type ProductSize } from "./product-sizes";
+import { isProductSize, sizePrice, normalSizePrice, type ProductSize } from "./product-sizes";
 
 export type Cart = Record<string, number>;
 export const CART_KEY = "kbloom-cart";
@@ -13,7 +13,7 @@ export function cartItems(cart: Cart, products: Product[]) {
     const [id, size = "full"] = key.split(":");
     const product = products.find((entry) => entry.id === id);
     if (!product || !isProductSize(size) || !Number.isSafeInteger(quantity) || quantity <= 0) return [];
-    return [{ key, product, size, quantity, price: sizePrice(product, size) }];
+    return [{ key, product, size, quantity, price: sizePrice(product, size), normalPrice: normalSizePrice(product, size) }];
   });
 }
 

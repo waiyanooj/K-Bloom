@@ -13,7 +13,7 @@ export function readOrderReceipt(): OrderReceipt | null {
     const receipt = JSON.parse(sessionStorage.getItem(key) || "null");
     if (receipt && /^KB-[0-9a-f-]{36}$/i.test(receipt.orderId) &&
       Number.isSafeInteger(receipt.itemCount) && receipt.itemCount > 0 &&
-      Number.isSafeInteger(receipt.subtotal) && receipt.subtotal > 0) return receipt;
+      Number.isSafeInteger(receipt.subtotal) && receipt.subtotal >= 0) return receipt;
   } catch { /* A direct visit can have no saved receipt. */ }
   return null;
 }

@@ -4,6 +4,7 @@ export interface Product {
   family: "Men's" | "Women's" | "Unisex";
   notes: string;
   price: number;
+  promotion?: number;
   priceLabel?: string;
   tint: string;
   popular: boolean;

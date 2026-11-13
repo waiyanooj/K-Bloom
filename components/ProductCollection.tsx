@@ -8,7 +8,8 @@ import { categories } from "../lib/products";
 import { useProducts } from "./ProductProvider";
 
 import { cartKey, readCart, writeCart, type Cart } from "../lib/cart";
-import { sizeLabel, sizePrice, type ProductSize } from "../lib/product-sizes";
+import { sizeLabel, sizePrice, normalSizePrice, type ProductSize } from "../lib/product-sizes";
+import PromotionPrice, { PromotionBadge } from "./PromotionPrice";
 import SizeSelect from "./SizeSelect";
 type ProductStyle = CSSProperties & { "--product-tint": string };
 
@@ -271,7 +272,7 @@ export default function ProductCollection({
                     <p className="product-family">
                       <span>{product.family}</span><span>Eau de parfum</span>
                     </p>
-                    <h3>{product.name}</h3>
+                    <h3>{product.name} <PromotionBadge promotion={product.promotion} /></h3>
                     <p className="product-notes">{product.notes}</p>
                     <div className="product-purchase">
                     <SizeSelect product={product} value={size} onChange={(value) => {
@@ -279,8 +280,8 @@ export default function ProductCollection({
                       setAddedProduct(null);
                     }} />
                     <p className="product-price">
-                      {sizePrice(product, size).toLocaleString("en-US")}{" "}
-                      <small>MMK / {sizeLabel(product, size)}</small>
+                      <PromotionPrice price={sizePrice(product, size)} normalPrice={normalSizePrice(product, size)} promotion={product.promotion} />
+                      <small> / {sizeLabel(product, size)}</small>
                     </p>
                     <button
                       type="button"

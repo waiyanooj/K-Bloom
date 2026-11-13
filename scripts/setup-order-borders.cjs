@@ -34,7 +34,7 @@ async function main() {
       startRowIndex: 0,
       endRowIndex: 2,
       startColumnIndex: 0,
-      endColumnIndex: 12,
+      endColumnIndex: 13,
     },
   ];
   rows.forEach((row, index) => {
@@ -44,7 +44,7 @@ async function main() {
         startRowIndex: index + 2,
         endRowIndex: index + 3,
         startColumnIndex: 0,
-        endColumnIndex: 12,
+        endColumnIndex: 13,
       });
   });
   await api.spreadsheets.batchUpdate({
@@ -67,7 +67,7 @@ async function main() {
       spreadsheetId,
       ranges: ranges
         .slice(1)
-        .map((r) => `'Order'!A${r.startRowIndex + 1}:L${r.endRowIndex}`),
+        .map((r) => `'Order'!A${r.startRowIndex + 1}:M${r.endRowIndex}`),
       fields: "sheets(data(rowData(values(userEnteredFormat(borders)))))",
     })
   ).data;

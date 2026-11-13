@@ -19,7 +19,7 @@ async function saveOrder(order: ReturnType<typeof parseOrder>) {
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
   const api = sheets({ version: "v4", auth });
-  const range = "'Order'!A3:L";
+  const range = "'Order'!A3:M";
   // Reuse the customer's reference when retrying after an interrupted response.
   const existing = await api.spreadsheets.values.get(
     { spreadsheetId, range: "'Order'!A3:A" },
@@ -32,12 +32,12 @@ async function saveOrder(order: ReturnType<typeof parseOrder>) {
     const border = { style: "SOLID", color: { red: 0.65, green: 0.6, blue: 0.63 } };
     await api.spreadsheets.batchUpdate({ spreadsheetId, requestBody: { requests: [...rowIndexes.map((rowIndex) => ({
       setDataValidation: {
-        range: { sheetId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1, startColumnIndex: 11, endColumnIndex: 12 },
+        range: { sheetId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1, startColumnIndex: 12, endColumnIndex: 13 },
         rule: { condition: { type: "ONE_OF_LIST", values: [{ userEnteredValue: "Pending" }, { userEnteredValue: "Accept" }] }, strict: true, showCustomUi: true },
       },
     })), ...rowIndexes.map((rowIndex) => ({
       updateBorders: {
-        range: { sheetId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1, startColumnIndex: 0, endColumnIndex: 12 },
+        range: { sheetId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1, startColumnIndex: 0, endColumnIndex: 13 },
         top: border, bottom: border, left: border, right: border, innerVertical: border,
       },
     }))] } }, { timeout: 15000 });
@@ -58,7 +58,7 @@ async function saveOrder(order: ReturnType<typeof parseOrder>) {
     },
     { timeout: 20000, retry: false },
   );
-  const writtenRange = appended.data.updates?.updatedRange?.match(/!A(\d+):L(\d+)$/);
+  const writtenRange = appended.data.updates?.updatedRange?.match(/!A(\d+):M(\d+)$/);
   if (!writtenRange) throw new Error("Missing appended row range");
   const firstRow = Number(writtenRange[1]) - 1;
   const endRow = Number(writtenRange[2]);

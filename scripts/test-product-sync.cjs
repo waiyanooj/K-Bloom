@@ -19,7 +19,7 @@ async function main() {
   const sizes = await load("lib/product-sizes.ts");
   const { sizePrice } = sizes.module;
   const {
-    module: { parseOrder },
+    module: { parseOrder, orderRows },
   } = await load("lib/orders.ts", { "./product-sizes": sizes.url });
   const {
     module: { cartItems, changeCartSize, readCart },
@@ -105,6 +105,26 @@ async function main() {
     ],
   };
   assert.equal(parseOrder(order, catalog).items[0].price, 560000);
+  for (const input of [0.1, "10%", "10.0%"] ) {
+    const promoted = parseProductSheet([[...productHeaders, "Promotion"], [...rows[1], input]]);
+    assert.equal(sizePrice(promoted[0], "full"), 504000);
+    assert.equal(sizePrice(promoted[0], "5ml"), 31500);
+    const bag = cartItems({ "8321:5ml": 3 }, promoted)[0];
+    assert.equal(bag.price * bag.quantity, 94500);
+    assert.equal(bag.normalPrice, 35000);
+    assert.throws(() => parseOrder(order, promoted), /price has changed/);
+    const discountedOrder = { ...order, items: [{ productId: "8321", size: "5ml", quantity: 3, unitPrice: 31500 }] };
+    const saved = orderRows(parseOrder(discountedOrder, promoted))[0];
+    assert.deepEqual(saved.slice(8), [35000, 3, 0.1, 94500, "Pending"]);
+    assert.throws(() => parseOrder(discountedOrder, catalog), /price has changed/);
+  }
+  for (const input of ["bad", -0.1, 10, "101%", "-1%"])
+    assert.throws(() => parseProductSheet([[...productHeaders, "Promotion"], [...rows[1], input]]), /Promotion/);
+  for (const [input, expected] of [["", 560000], [0, 560000], ["100%", 0]]) {
+    const promoted = parseProductSheet([[...productHeaders, "Promotion"], [...rows[1], input]]);
+    assert.equal(sizePrice(promoted[0], "full"), expected);
+  }
+  assert.equal(sizePrice({ ...catalog[0], price: 101, promotion: 0.125 }, "full"), 88);
   assert.throws(() => parseOrder(order, updated), /price has changed/);
   assert.throws(
     () => parseOrder(order, parseProductSheet(hidden)),

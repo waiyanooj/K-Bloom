@@ -48,6 +48,10 @@ export function sizeLabel(product: Product, size: ProductSize): string {
 }
 
 export function sizePrice(product: Product, size: ProductSize): number {
+  return Math.round(normalSizePrice(product, size) * (1 - (product.promotion ?? 0)));
+}
+
+export function normalSizePrice(product: Product, size: ProductSize): number {
   if (size === "full") return product.price;
   if (product.sizePrices) return product.sizePrices[size];
   const column = { "5ml": 0, "10ml": 1, "30ml": 2, "50ml": 3 } as const;

@@ -24,15 +24,15 @@ async function main() {
     (
       await api.spreadsheets.values.get({
         spreadsheetId,
-        range: "'Order'!A1:L",
+        range: "'Order'!A1:M",
       })
     ).data.values || [];
-  if (values[0]?.[11] && values[0][11] !== "Status")
-    throw new Error("Column L is already in use");
-  if (values[1]?.[11]) throw new Error("L2 is already in use");
+  if (values[0]?.[12] && values[0][12] !== "Status")
+    throw new Error("Column M is already in use");
+  if (values[1]?.[12]) throw new Error("M2 is already in use");
   const unknownStatus = values
     .slice(2)
-    .some((row) => row[11] && !["Pending", "Accept"].includes(row[11]));
+    .some((row) => row[12] && !["Pending", "Accept"].includes(row[12]));
   if (unknownStatus) throw new Error("Existing status values need review");
   console.log(
     JSON.stringify({
@@ -48,26 +48,26 @@ async function main() {
     sheetId,
     startRowIndex: 2,
     startColumnIndex: 0,
-    endColumnIndex: 12,
+    endColumnIndex: 13,
   };
   const formulas = [
-    '=AND($A3<>"",$L3="Pending")',
-    '=AND($A3<>"",$L3="Accept")',
+    '=AND($A3<>"",$M3="Pending")',
+    '=AND($A3<>"",$M3="Accept")',
   ];
   const requests = [];
   const statusHeader = {
     sheetId,
     startRowIndex: 0,
     endRowIndex: 2,
-    startColumnIndex: 11,
-    endColumnIndex: 12,
+    startColumnIndex: 12,
+    endColumnIndex: 13,
   };
   const overlapping = (sheet.merges || []).filter(
     (m) =>
       (m.startRowIndex || 0) < 2 &&
       m.endRowIndex > 0 &&
-      (m.startColumnIndex || 0) < 12 &&
-      m.endColumnIndex > 11,
+      (m.startColumnIndex || 0) < 13 &&
+      m.endColumnIndex > 12,
   );
   if (
     overlapping.some(
@@ -76,8 +76,8 @@ async function main() {
         !(
           m.startRowIndex === 0 &&
           m.endRowIndex === 2 &&
-          m.startColumnIndex === 11 &&
-          m.endColumnIndex === 12
+          m.startColumnIndex === 12 &&
+          m.endColumnIndex === 13
         ),
     )
   )
@@ -88,8 +88,8 @@ async function main() {
         sheetId,
         startRowIndex: 0,
         endRowIndex: 2,
-        startColumnIndex: 10,
-        endColumnIndex: 11,
+        startColumnIndex: 11,
+        endColumnIndex: 12,
       },
       destination: statusHeader,
       pasteType: "PASTE_FORMAT",
@@ -101,20 +101,20 @@ async function main() {
     });
   requests.push({
     updateCells: {
-      start: { sheetId, rowIndex: 0, columnIndex: 11 },
+      start: { sheetId, rowIndex: 0, columnIndex: 12 },
       rows: [{ values: [{ userEnteredValue: { stringValue: "Status" } }] }],
       fields: "userEnteredValue",
     },
   });
   requests.push({
     updateDimensionProperties: {
-      range: { sheetId, dimension: "COLUMNS", startIndex: 11, endIndex: 12 },
+      range: { sheetId, dimension: "COLUMNS", startIndex: 12, endIndex: 13 },
       properties: { pixelSize: 130 },
       fields: "pixelSize",
     },
   });
   requests.push({
-    setDataValidation: { range: { ...range, startColumnIndex: 11 } },
+    setDataValidation: { range: { ...range, startColumnIndex: 12 } },
   });
   values.slice(2).forEach((row, index) => {
     if (row[0])
@@ -124,7 +124,7 @@ async function main() {
             ...range,
             startRowIndex: index + 2,
             endRowIndex: index + 3,
-            startColumnIndex: 11,
+            startColumnIndex: 12,
           },
           rule: {
             condition: {
@@ -177,10 +177,10 @@ async function main() {
     }),
   );
   values.slice(2).forEach((row, index) => {
-    if (row[0] && !row[11])
+    if (row[0] && !row[12])
       requests.push({
         updateCells: {
-          start: { sheetId, rowIndex: index + 2, columnIndex: 11 },
+          start: { sheetId, rowIndex: index + 2, columnIndex: 12 },
           rows: [
             { values: [{ userEnteredValue: { stringValue: "Pending" } }] },
           ],
@@ -195,7 +195,7 @@ async function main() {
   const check = (
     await api.spreadsheets.get({
       spreadsheetId,
-      ranges: ["'Order'!L1:L"],
+      ranges: ["'Order'!M1:M"],
       fields:
         "sheets(conditionalFormats,data(rowData(values(userEnteredValue,dataValidation))))",
     })

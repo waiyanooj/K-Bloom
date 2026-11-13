@@ -1,5 +1,5 @@
 import type { Product } from "./products";
-import { isProductSize, sizeLabel, sizePrice } from "./product-sizes";
+import { isProductSize, sizeLabel, sizePrice, normalSizePrice } from "./product-sizes";
 
 export class InvalidOrder extends Error {}
 
@@ -38,7 +38,7 @@ export function parseOrder(value: unknown, products: Product[]) {
     seen.add(key);
     const price = sizePrice(product, item.size);
     if (item.unitPrice !== price) throw new InvalidOrder("A product price has changed. Please wait for updated prices, then review and submit your order again.");
-    return { product, size: item.size, quantity: item.quantity, price };
+    return { product, size: item.size, quantity: item.quantity, price, normalPrice: normalSizePrice(product, item.size) };
   });
   return { orderId: `KB-${requestId}`, name, phone1, phone2, address, items };
 }
@@ -47,8 +47,9 @@ export function orderRows(order: ReturnType<typeof parseOrder>, date = new Date(
   const timestamp = new Intl.DateTimeFormat("en-GB", {
     timeZone: "Asia/Yangon", dateStyle: "short", timeStyle: "medium", hour12: false,
   }).format(date);
-  return order.items.map(({ product, size, price, quantity }) => [
+  return order.items.map(({ product, size, price, normalPrice, quantity }) => [
     order.orderId, timestamp, order.name, order.phone1, order.phone2,
-    order.address, product.name.trim(), sizeLabel(product, size), price, quantity, price * quantity, "Pending",
+    order.address, product.name.trim(), sizeLabel(product, size), normalPrice, quantity,
+    product.promotion ?? 0, price * quantity, "Pending",
   ]);
 }

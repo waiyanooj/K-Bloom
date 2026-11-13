@@ -20,6 +20,11 @@ export function parseProductSheet(rows: unknown[][]): Product[] {
       return value === "true";
     };
     const id = field("ID");
+    if (headers.filter((header) => header === "Promotion").length > 1) invalid("Promotion header");
+    const promotionText = field("Promotion");
+    const promotion = promotionText.endsWith("%")
+      ? Number(promotionText.slice(0, -1).trim()) / 100 : Number(promotionText);
+    if (!Number.isFinite(promotion) || promotion < 0 || promotion > 1) invalid("Promotion (use 10% for ten percent off)");
     if (!/^[a-zA-Z0-9_-]+$/.test(id) || seen.has(id)) invalid("ID (must be unique)");
     seen.add(id);
     if (!flag("Active")) return [];
@@ -45,7 +50,7 @@ export function parseProductSheet(rows: unknown[][]): Product[] {
     detailImages.forEach((url) => checkImage(url, "Detail Image URLs"));
     const tint = field("Tint") || "#eee5f1";
     if (!/^#[0-9a-f]{6}$/i.test(tint)) invalid("Tint");
-    return [{ id, name, family, notes: field("Notes"), price: price("Full Price (MMK)"),
+    return [{ id, name, family, promotion, notes: field("Notes"), price: price("Full Price (MMK)"),
       sizePrices: { "5ml": price("5ml (MMK)"), "10ml": price("10ml (MMK)"), "30ml": price("30ml (MMK)"), "50ml": price("50ml (MMK)") },
       priceLabel: field("Price Label") || undefined, image, detailImages, tint, popular: flag("Popular") }];
   });

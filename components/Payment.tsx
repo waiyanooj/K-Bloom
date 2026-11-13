@@ -8,6 +8,7 @@ import { CART_KEY, readCart, writeCart, type Cart } from "../lib/cart";
 import { cartItems } from "../lib/cart";
 import { sizeLabel } from "../lib/product-sizes";
 import { useProducts } from "./ProductProvider";
+import PromotionPrice, { PromotionBadge } from "./PromotionPrice";
 
 const money = (value: number) => `${value.toLocaleString("en-US")} MMK`;
 
@@ -211,16 +212,16 @@ export default function Payment() {
             </p>
           ) : (
             <ul className="payment-order-items">
-              {items.map(({ key, product, size, price, quantity }) => (
+              {items.map(({ key, product, size, price, normalPrice, quantity }) => (
                 <li key={key}>
                   <div>
-                    <h3>{product.name.trim()}</h3>
+                    <h3>{product.name.trim()} <PromotionBadge promotion={product.promotion} /></h3>
                     <p>
                       {sizeLabel(product, size)} · Qty{" "}
                       {cart[key]}
                     </p>
                   </div>
-                  <strong>{money(price * quantity)}</strong>
+                  <PromotionPrice price={price * quantity} normalPrice={normalPrice * quantity} promotion={product.promotion} />
                 </li>
               ))}
             </ul>

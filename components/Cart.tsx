@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { cartItems, changeCartSize } from "../lib/cart";
 import { sizeLabel } from "../lib/product-sizes";
 import SizeSelect from "./SizeSelect";
+import PromotionPrice, { PromotionBadge } from "./PromotionPrice";
 import { useProducts } from "./ProductProvider";
 import {
   CART_KEY,
@@ -115,7 +116,7 @@ export default function Cart() {
               <span>FRAGRANCE / {items.length} selections</span>
               <span>YOUR EDIT</span>
             </div>
-            {items.map(({ key, product, size, price, quantity }) => (
+            {items.map(({ key, product, size, price, normalPrice, quantity }) => (
               <article
                 className="bag-item"
                 key={key}
@@ -138,9 +139,9 @@ export default function Cart() {
                   <p className="bag-eyebrow">
                     {product.family} / Eau de parfum
                   </p>
-                  <h2>{product.name.trim()}</h2>
+                  <h2>{product.name.trim()} <PromotionBadge promotion={product.promotion} /></h2>
                   <p className="bag-unit-price">
-                    {money(price)} / {sizeLabel(product, size)}
+                    <PromotionPrice price={price} normalPrice={normalPrice} promotion={product.promotion} /> / {sizeLabel(product, size)}
                   </p>
                   <SizeSelect product={product} value={size} onChange={(value) => {
                     update(changeCartSize(cart, key, value, products), "Size and price updated.");
