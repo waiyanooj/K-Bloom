@@ -26,7 +26,7 @@ export async function getProducts(fresh = false): Promise<Product[]> {
     const response = await api.spreadsheets.values.get(
       {
         spreadsheetId,
-        range: "'Products'!A:P",
+        range: "'Products'!A:R",
         valueRenderOption: "UNFORMATTED_VALUE",
       },
       { timeout: 15000, retry: false },

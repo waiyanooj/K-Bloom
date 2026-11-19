@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "import:images": "node scripts/import-images.cjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

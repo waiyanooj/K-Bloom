@@ -72,7 +72,30 @@ Popular controls the home page's popular selection. Uncheck Active to hide a
 product. Price Label, Notes, and Tint are optional; Tint defaults to `#eee5f1`.
 New products must include all four decant prices as well as the full-size price.
 Add rows below the existing products and check Active when ready. Stock quantities
-and image-file uploads are not managed by this integration.
+are not managed by this integration.
+
+### Import images from this computer
+
+Double-click `Import Product Images.cmd` (requires Node.js). In Windows Explorer,
+right-click an image and choose **Copy as path**, paste it into the helper, and
+press Enter. Repeat for gallery images, then press Enter on a blank line.
+The helper copies PNG/JPEG/GIF/WebP images (up to 20 MB each) to
+`public/img/uploads`, prints their website URLs, and copies them to the Windows
+clipboard. Original files are preserved; content hashes prevent name collisions.
+Paste one URL into `Image URL`. For several detail images, edit a single
+`Detail Image URLs` cell before pasting the newline-separated URLs.
+
+Alternatively run:
+
+```powershell
+npm.cmd run import:images -- "C:\Users\wiayan\Downloads\Pensive Gaze Beneath Storm Clouds.png"
+```
+
+Do not paste `C:\...` paths directly into Sheets: visitors cannot access your
+computer. For a hosted site, commit/include the imported files and redeploy the
+app **before** changing the Sheet. This helper does not upload to cloud storage
+or edit Sheets. To add images online without redeploying, upload to public image
+storage and use its direct HTTPS image URLs instead.
 
 The browser checks `/api/products` every 30 seconds while visible and on focus.
 The server caches validated reads for at most 30 seconds, so edits normally appear
